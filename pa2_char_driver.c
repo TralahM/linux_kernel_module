@@ -73,3 +73,5 @@ static void pa2_char_driver_exit(void)
 }
 
 /* add module_init and module_exit to point to the corresponding init and exit function*/
+module_init(pa2_char_driver_init);
+module_exit(pa2_char_driver_exit);

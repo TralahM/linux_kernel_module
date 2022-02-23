@@ -13,7 +13,7 @@
 #define BUFFER_SIZE 1024
 
 /* Define device_buffer and other global data structures you will need here */
-dev_t pa2_dev = MKDEV(240, 0);
+int k, pa2_devno = MKDEV(240, 0);
 
 ssize_t pa2_char_driver_read(struct file *pfile, char __user *buffer,
                              size_t length, loff_t *offset) {
@@ -71,10 +71,12 @@ struct file_operations pa2_char_driver_file_operations = {
 static int pa2_char_driver_init(void) {
   /* print to the log file that the init function is called.*/
   /* register the device */
-  int k =
-      register_chrdev_region(pa2_dev, BUFFER_SIZE, "simple_character_device");
+  k = register_chrdev(pa2_devno, "simple_char_device",
+                      &pa2_char_driver_file_operations);
+
+  /* Fail gracefully if need be */
   if (k != 0) {
-    return -1;
+    printk(KERN_NOTICE "Error %d adding scull", k);
   }
   return 0;
 }
@@ -82,7 +84,7 @@ static int pa2_char_driver_init(void) {
 static void pa2_char_driver_exit(void) {
   /* print to the log file that the exit function is called.*/
   /* unregister  the device using the register_chrdev() function. */
-  unregister_chrdev_region(pa2_dev, BUFFER_SIZE);
+  unregister_chrdev(pa2_devno, "simple_char_device");
 }
 
 /* add module_init and module_exit to point to the corresponding init and exit

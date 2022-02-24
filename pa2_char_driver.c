@@ -29,9 +29,14 @@ ssize_t pa2_char_driver_read(struct file* pfile, char __user* buffer,
     /* copy_to_user function: source is device_buffer and destination is the
      * userspace buffer *buffer */
     // TODO specify count of bytes to copy
-    copy_to_user(buffer, device_buffer, 1);
+    int bytes_read=0;
+    while(length&&*device_buffer){
+        copy_to_user(*(buffer++), device_buffer++, 1);
+        length--;
+        bytes_read++;
+    }
 
-    return 0;
+    return bytes_read;
 }
 
 ssize_t pa2_char_driver_write(struct file* pfile, const char __user* buffer,
@@ -43,7 +48,8 @@ ssize_t pa2_char_driver_write(struct file* pfile, const char __user* buffer,
     /* copy_from_user function: destination is device_buffer and source is the
      * userspace buffer *buffer */
     // TODO specify count of bytes to copy
-    copy_from_user(device_buffer, buffer, 1);
+    if(copy_from_user(device_buffer, buffer, length)){return -EFAULT;};
+    *offset+=length;
 
     return length;
 }

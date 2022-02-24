@@ -107,3 +107,6 @@ static void pa2_char_driver_exit(void) {
  * function*/
 module_init(pa2_char_driver_init);
 module_exit(pa2_char_driver_exit);
+MODULE_LICENSE("GPL");
+MODULE_DESCRIPTION("Simple Character Device Driver Module");
+MODULE_AUTHOR("TralahM");

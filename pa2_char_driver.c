@@ -130,29 +130,18 @@ static int __init pa2_char_driver_init(void) {
     device_buffer = kmalloc(BUFFER_SIZE, GFP_KERNEL);
     /* register the device */
     devno = MKDEV(MAJOR_NO, MINOR_NO);
-    /* err = register_chrdev(MAJOR(devno), 1, NAME, */
-    /*                       &pa2_char_driver_file_operations); */
-    if ((err = alloc_chrdev_region(&devno, 0, 1, NAME))) {
-        printk(KERN_ALERT "FAILED");
-        return err;
-    }
-    printk(KERN_INFO "Device Number %d MAJ:%d MIN:%d\n", devno, MAJOR(devno),
-           MINOR(devno));
-
+    err = register_chrdev(MAJOR(devno), 1, NAME,
+                          &pa2_char_driver_file_operations);
     /* Fail gracefully if need be */
     if (err < 0) {
-        printk(
-            KERN_ALERT
-            "[%s ]:FUNC: %s: LINE: %d \nError %d registering and adding %s\n",
-            __FILE__, __FUNCTION__, __LINE__, err, NAME);
+        if ((err = alloc_chrdev_region(&devno, 0, 1, NAME))) {
+            printk(KERN_ALERT
+                   "[%s ]:FUNC: %s: LINE: %d \nError %d registering "
+                   "and adding %s\n",
+                   __FILE__, __FUNCTION__, __LINE__, err, NAME);
+            return err;
+        }
     }
-    printk(KERN_INFO "I was assigned major number %d. To talk to\n",
-           MAJOR(devno));
-    printk(KERN_INFO "the driver, create a dev file with\n");
-    printk(KERN_INFO "'mknod /dev/%s c %d 0'.\n", NAME, MAJOR(devno));
-    printk(KERN_INFO "Try various minor numbers. Try to cat and echo to\n");
-    printk(KERN_INFO "the device file.\n");
-    printk(KERN_INFO "Remove the device file and module when done.\n");
     cdev_init(&cdev, &pa2_char_driver_file_operations);
     err = cdev_add(&cdev, devno, 1);  // register
     if (err < 0) {
@@ -160,6 +149,17 @@ static int __init pa2_char_driver_init(void) {
         unregister_chrdev_region(devno, 1);  // Logout equipment number
         return err;
     }
+
+    printk(KERN_INFO "Device Number %d MAJ:%d MIN:%d\n", devno, MAJOR(devno),
+           MINOR(devno));
+
+    printk(KERN_INFO "I was assigned major number %d. To talk to\n",
+           MAJOR(devno));
+    printk(KERN_INFO "the driver, create a dev file with\n");
+    printk(KERN_INFO "'mknod /dev/%s c %d 0'.\n", NAME, MAJOR(devno));
+    printk(KERN_INFO "Try various minor numbers. Try to cat and echo to\n");
+    printk(KERN_INFO "the device file.\n");
+    printk(KERN_INFO "Remove the device file and module when done.\n");
     return 0;
 }
 

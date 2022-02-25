@@ -33,7 +33,7 @@ $ sudo insmod pa2_char_driver.ko
 $ sudo dmesg
 ```
 Find the command to create a supported character device with major and minor
-numbers using dmesg.
+numbers using `dmesg`.
 
 The Output is Similar to this:
 

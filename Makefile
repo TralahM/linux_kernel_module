@@ -20,4 +20,4 @@ cleantest:
 	rm test_driver_implementation.o
 
 runtest:
-	./test_driver_implementation.o /dev/schrdev
+	./test_driver_implementation.o /dev/simple_char_device

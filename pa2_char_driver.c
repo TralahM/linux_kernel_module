@@ -169,7 +169,7 @@ static void pa2_char_driver_exit(void) {
     printk(KERN_INFO "Exit Function Called.\n");
     /* unregister  the device using the unregister_chrdev() function. */
     kfree(device_buffer);
-    cdev_del(cdev);
+    cdev_del(&cdev);
     if (ALLOC_MODE) {
         unregister_chrdev_region(devno, 1);
         return;

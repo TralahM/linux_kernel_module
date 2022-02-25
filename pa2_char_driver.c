@@ -22,6 +22,7 @@ static int NUM_OPENS = 0;
 char* device_buffer;
 static dev_t devno;
 static struct cdev cdev;
+static int ALLOC_MODE = 0;
 
 ssize_t pa2_char_driver_read(struct file* pfile, char __user* buffer,
                              size_t length, loff_t* offset) {
@@ -131,6 +132,7 @@ static int __init pa2_char_driver_init(void) {
     /* Fail gracefully if need be */
     if (err < 0) {
         if ((err = alloc_chrdev_region(&devno, 0, 1, NAME))) {
+            ALLOC_MODE = 1;
             printk(KERN_ALERT
                    "[%s ]:FUNC: %s: LINE: %d \nError %d registering "
                    "and adding %s\n",
@@ -167,7 +169,12 @@ static void pa2_char_driver_exit(void) {
     printk(KERN_INFO "Exit Function Called.\n");
     /* unregister  the device using the unregister_chrdev() function. */
     kfree(device_buffer);
-    unregister_chrdev(MAJOR_NO, NAME);
+    cdev_del(cdev);
+    if (ALLOC_MODE) {
+        unregister_chrdev_region(devno, 1);
+        return;
+    }
+    unregister_chrdev(MAJOR(devno), NAME);
 }
 
 /* add module_init and module_exit to point to the corresponding init and exit

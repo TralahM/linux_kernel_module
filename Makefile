@@ -12,3 +12,12 @@ all:
 
 clean:
 	make -C $(KERNEL_SRC) M=$(PWD) clean
+
+test:
+	gcc -Wall test_driver_implementation.c -o test_driver_implementation.o
+
+cleantest:
+	rm test_driver_implementation.o
+
+runtest:
+	./test_driver_implementation.o /dev/schrdev

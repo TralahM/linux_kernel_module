@@ -13,9 +13,6 @@
 #include <linux/uaccess.h>
 
 #define BUFFER_SIZE 1024
-#define PRINT_DEBUG                                                            \
-    printk(KERN_DEBUG "[% s]: FUNC:% s: LINE:% d \ n", __FILE__, __FUNCTION__, \
-           __LINE__)
 /* Define device_buffer and other global data structures you will need here */
 const char* NAME = "simple_char_device";
 static int MAJOR_NO = 250;
@@ -130,8 +127,7 @@ static int __init pa2_char_driver_init(void) {
     device_buffer = kmalloc(BUFFER_SIZE, GFP_KERNEL);
     /* register the device */
     devno = MKDEV(MAJOR_NO, MINOR_NO);
-    err = register_chrdev(MAJOR(devno), 1, NAME,
-                          &pa2_char_driver_file_operations);
+    err = register_chrdev(MAJOR(devno), NAME, &pa2_char_driver_file_operations);
     /* Fail gracefully if need be */
     if (err < 0) {
         if ((err = alloc_chrdev_region(&devno, 0, 1, NAME))) {
@@ -145,7 +141,10 @@ static int __init pa2_char_driver_init(void) {
     cdev_init(&cdev, &pa2_char_driver_file_operations);
     err = cdev_add(&cdev, devno, 1);  // register
     if (err < 0) {
-        PRINT_DEBUG;
+        printk(KERN_ALERT
+               "[%s ]:FUNC: %s: LINE: %d \nError %d adding cdev_add "
+               "%s\n",
+               __FILE__, __FUNCTION__, __LINE__, err, NAME);
         unregister_chrdev_region(devno, 1);  // Logout equipment number
         return err;
     }

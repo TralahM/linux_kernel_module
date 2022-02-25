@@ -1,0 +1,8 @@
+[ 2745.881449] INIT Function Called.
+[ 2745.881453] Device Number 535822336 MAJ:511 MIN:0
+[ 2745.881454] I was assigned major number 511. To talk to
+[ 2745.881454] the driver, create a dev file with
+[ 2745.881454] 'mknod /dev/simple_char_device c 511 0'.
+[ 2745.881455] Try various minor numbers. Try to cat and echo to
+[ 2745.881455] the device file.
+[ 2745.881456] Remove the device file and module when done.

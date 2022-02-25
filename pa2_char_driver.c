@@ -155,7 +155,7 @@ static int __init pa2_char_driver_init(void) {
     printk(KERN_INFO "I was assigned major number %d. To talk to\n",
            MAJOR(devno));
     printk(KERN_INFO "the driver, create a dev file with\n");
-    printk(KERN_INFO "'mknod /dev/%s c %d 0'.\n", NAME, MAJOR(devno));
+    printk(KERN_INFO "'mknod /dev/%s -m 777 c %d 0'.\n", NAME, MAJOR(devno));
     printk(KERN_INFO "Try various minor numbers. Try to cat and echo to\n");
     printk(KERN_INFO "the device file.\n");
     printk(KERN_INFO "Remove the device file and module when done.\n");

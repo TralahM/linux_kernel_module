@@ -52,6 +52,16 @@ The Output is Similar to this:
 Then Run the command `sudo mknod /dev/simple_char_device -m 777 c 511 0`
 
 
+# Testing.
+
+Run
+```
+$ make test
+$ make runtest
+$ cat /dev/simple_char_device
+```
+
+
 # Contributing
 [See the Contributing File](CONTRIBUTING.rst)
 

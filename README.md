@@ -29,11 +29,20 @@ indicated by `uname -r`.
 $ git clone https://github.com/TralahM/linux_kernel_module.git
 $ cd linux_kernel_module
 $ make
+```
+
+
+### output should be
+
+![filetree.png](filetree.png)
+
+
+```console
 $ sudo insmod pa2_char_driver.ko
 $ sudo dmesg
 ```
 Find the command to create a supported character device with major and minor
-numbers using `dmesg`.
+numbers using `dmesg` or `cat /var/log/syslog`.
 
 The Output is Similar to this:
 

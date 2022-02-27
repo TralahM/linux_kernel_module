@@ -89,7 +89,7 @@ loff_t pa2_char_driver_seek(struct file* pfile, loff_t offset, int whence) {
     /* Update open file position according to the values of offset and whence */
     loff_t new_pos = 0;
     switch (whence) {
-        case 0:
+        case 0:  // SEEK_SET
             new_pos = offset;
             break;
         case 1:  // SEEK_CUR

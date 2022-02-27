@@ -132,12 +132,13 @@ static int __init pa2_char_driver_init(void) {
     /* Fail gracefully if need be */
     if (err < 0) {
         if ((err = alloc_chrdev_region(&devno, 0, 1, NAME))) {
-            ALLOC_MODE = 1;
             printk(KERN_ALERT
                    "[%s ]:FUNC: %s: LINE: %d \nError %d registering "
                    "and adding %s\n",
                    __FILE__, __FUNCTION__, __LINE__, err, NAME);
             return err;
+        } else {
+            ALLOC_MODE = 1;
         }
     }
     cdev_init(&cdev, &pa2_char_driver_file_operations);

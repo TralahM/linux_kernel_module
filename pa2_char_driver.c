@@ -165,7 +165,7 @@ static int __init pa2_char_driver_init(void) {
     return 0;
 }
 
-static void pa2_char_driver_exit(void) {
+static void __exit pa2_char_driver_exit(void) {
     /* print to the log file that the exit function is called.*/
     printk(KERN_INFO "Exit Function Called.\n");
     /* unregister  the device using the unregister_chrdev() function. */

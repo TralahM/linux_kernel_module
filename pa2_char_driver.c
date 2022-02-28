@@ -15,7 +15,7 @@
 #define BUFFER_SIZE 1024
 /* Define device_buffer and other global data structures you will need here */
 const char* NAME = "simple_char_device";
-static int MAJOR_NO = 250;
+static int MAJOR_NO = 240;
 static int MINOR_NO = 0;
 static int NUM_CLOSES = 0;
 static int NUM_OPENS = 0;

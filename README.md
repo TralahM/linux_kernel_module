@@ -58,6 +58,10 @@ The Output is Similar to this:
 
 ```
 
+After running `insmod` the appropriate device will be created automatically for
+you and removed when you call `rmmod`.
+
+if for som reason however it is not created,
 Then Run the command `sudo mknod /dev/simple_char_device -m 777 c 511 0`
 
 
@@ -68,7 +72,11 @@ Run
 $ make test
 $ make runtest
 $ cat /dev/simple_char_device
+$ sudo dmesg
 ```
+
+Should show the number of times the device was opened and closed.
+
 
 
 # Contributing

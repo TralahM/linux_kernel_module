@@ -7,6 +7,7 @@
 #include <linux/init.h>
 #include <linux/kdev_t.h>
 #include <linux/kernel.h>
+#include <linux/kmod.h>
 #include <linux/module.h>
 #include <linux/slab.h>
 #include <linux/types.h>
@@ -23,6 +24,9 @@ char* device_buffer;
 static dev_t devno;
 static struct cdev cdev;
 static int ALLOC_MODE = 0;
+
+static void create_char_device(char* dev_name, char* major_no);
+static void remove_char_device(char* dev_name);
 
 ssize_t pa2_char_driver_read(struct file* pfile, char __user* buffer,
                              size_t length, loff_t* offset) {
@@ -124,7 +128,8 @@ struct file_operations pa2_char_driver_file_operations = {
 static int __init pa2_char_driver_init(void) {
     /* print to the log file that the init function is called.*/
     int err;
-    printk(KERN_INFO "INIT Function Called.\n");
+    char major_str[BUFFER_SIZE];
+    printk(KERN_INFO "INIT Function Called.");
     device_buffer = kmalloc(BUFFER_SIZE, GFP_KERNEL);
     /* register the device */
     devno = MKDEV(MAJOR_NO, MINOR_NO);
@@ -152,30 +157,60 @@ static int __init pa2_char_driver_init(void) {
         return err;
     }
 
-    printk(KERN_INFO "Device Number %d MAJ:%d MIN:%d\n", devno, MAJOR(devno),
+    printk(KERN_INFO "Device Number %d MAJ:%d MIN:%d", devno, MAJOR(devno),
            MINOR(devno));
 
-    printk(KERN_INFO "I was assigned major number %d. To talk to\n",
+    printk(KERN_INFO "I was assigned major number %d. To talk to",
            MAJOR(devno));
-    printk(KERN_INFO "the driver, create a dev file with\n");
-    printk(KERN_INFO "'mknod /dev/%s -m 777 c %d 0'.\n", NAME, MAJOR(devno));
-    printk(KERN_INFO "Try various minor numbers. Try to cat and echo to\n");
-    printk(KERN_INFO "the device file.\n");
-    printk(KERN_INFO "Remove the device file and module when done.\n");
+    printk(KERN_INFO "the driver, created a dev file with");
+    printk(KERN_INFO "'mknod /dev/%s -m 777 c %d 0'.", NAME, MAJOR(devno));
+    printk(KERN_INFO "Try to cat and echo to the device file.");
+    printk(KERN_INFO
+           "It will removed the device file and you the module when done.");
+    sprintf(major_str, "%d", MAJOR(devno));
+    create_char_device(NAME, major_str);
     return 0;
+}
+
+static void create_char_device(char* dev_name, char* major_no) {
+    int err;
+    char* cmd = "/bin/mknod";
+    char arg1[BUFFER_SIZE];
+    printk("Creating character device %s in /dev/%s", dev_name, dev_name);
+    sprintf(arg1, "/dev/%s", dev_name);
+    char* argv[] = {cmd, arg1, "-m", "777", "c", major_no, "0", NULL};
+    char* envp[] = {"HOME=/", "PATH=/sbin:/bin:/usr/bin:/usr/sbin", NULL};
+    err = call_usermodehelper(cmd, argv, envp, 1);  // 1 to wait for completion
+    printk(KERN_INFO "Called create_char_device. call_usermodehelper: %d\n",
+           err);
+}
+static void remove_char_device(char* dev_name) {
+    int err;
+    char* cmd = "/bin/rm";
+    char arg1[BUFFER_SIZE];
+    printk(KERN_INFO "Removing character device: %s in /dev/%s", dev_name,
+           dev_name);
+    sprintf(arg1, "/dev/%s", dev_name);
+    char* argv[] = {cmd, arg1, NULL};
+    char* envp[] = {"HOME=/", "PATH=/sbin:/bin:/usr/bin:/usr/sbin", NULL};
+    err = call_usermodehelper(cmd, argv, envp, 1);  // 1 to wait for completion
+    printk(KERN_INFO "Called remove_char_device. call_usermodehelper: %d\n",
+           err);
 }
 
 static void __exit pa2_char_driver_exit(void) {
     /* print to the log file that the exit function is called.*/
-    printk(KERN_INFO "Exit Function Called.\n");
+    printk(KERN_INFO "Exit Function Called.");
     /* unregister  the device using the unregister_chrdev() function. */
     kfree(device_buffer);
     cdev_del(&cdev);
     if (ALLOC_MODE) {
         unregister_chrdev_region(devno, 1);
+        remove_char_device(NAME);
         return;
     }
     unregister_chrdev(MAJOR(devno), NAME);
+    remove_char_device(NAME);
 }
 
 /* add module_init and module_exit to point to the corresponding init and exit
